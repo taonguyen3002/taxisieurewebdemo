@@ -1,0 +1,17 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text { font-family: 'Arial', sans-serif; font-size: 24px; font-weight: bold; }
+    .brand-name { fill: #0D47A1; } /* Blue */
+    .highlight { fill: #4CAF50; } /* Green */
+  </style>
+  
+  <!-- Simple car icon -->
+  <g transform="translate(5, 15)">
+    <path d="M1.6,14.9l2.3-5.3h11.3c0.3,0,0.6-0.1,0.8-0.4l3.2-4.5c0.2-0.3,0.2-0.7,0-1C18.9,3.4,18.6,3.2,18.2,3.2H4.6 c-0.4,0-0.8,0.2-1,0.5L0.3,9.1C0.1,9.4,0,9.7,0,10v10.8c0,0.7,0.6,1.3,1.3,1.3h1.3c0.7,0,1.3-0.6,1.3-1.3v-0.7h9.3v0.7 c0,0.7,0.6,1.3,1.3,1.3h1.3c0.7,0,1.3-0.6,1.3-1.3V14.9H1.6z M5.1,5.8h11.3l-1.6,2.3H3.5L5.1,5.8z M3.3,19.6 c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S4.4,19.6,3.3,19.6z M15.3,19.6c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S16.4,19.6,15.3,19.6z" fill="#4CAF50"/>
+  </g>
+
+  <text x="50" y="38" class="text brand-name">
+    TAXI NHANH
+    <tspan class="highlight">247</tspan>
+  </text>
+</svg>
