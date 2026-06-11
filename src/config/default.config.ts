@@ -10,12 +10,12 @@ const siteConfig = {
   title: "Taxi Siêu Rẻ | Đặt 4 - 7 Chỗ Nhanh Nhất",
   description:
     "Dịch vụ taxi liên tỉnh siêu rẻ , xe đời mới tài lâu năm đón nhanh chỉ 5 phút gọi xe đặt xe nhiều ưu đãi",
-  domain: "https://taxisieure.com",
+  domain: "https://blogs.taxisieure.com",
   metaDescription:
     "Dịch vụ taxi liên tỉnh siêu rẻ , xe đời mới tài lâu năm đón nhanh chỉ 5 phút gọi xe đặt xe nhiều ưu đãi",
   keywords:
     "taxi, taxi sieu re,taxi điện , taxi xanh ,vinasun , taxi 4 cho, taxi 7 cho, grab 4 cho, grab 7 cho, dat xe grab, dat xe taxi",
-  logo: "https://taxisieure.com/logo.png",
+  logo: "https://blogs.taxisieure.com/logo.png",
   contactInfo: {
     phone: "0559023567",
     email: "nguyenhuutao1302@gmail.com",
