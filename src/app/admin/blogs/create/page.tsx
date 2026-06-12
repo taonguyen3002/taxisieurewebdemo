@@ -251,7 +251,7 @@ const NewPost: React.FC = () => {
           label="Tiêu đề"
           value={title}
           onChange={(e) => {
-            const t = e.target.value.replace(/\s+/g, " ").trim();
+            const t = e.target.value;
             const capitalized = t.toLowerCase().replace(/(^|\s)\S/g, (L) => L.toUpperCase());
             setTitle(capitalized);
             setSlug(generateSlug(capitalized));
