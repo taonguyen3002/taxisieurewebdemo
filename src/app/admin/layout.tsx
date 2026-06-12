@@ -7,12 +7,9 @@ import { useUser } from "@/context/UserContext";
 import Loader from "@/components/Loading";
 import AccessDeniedPage from "@/components/PageNotFound/AccessDeniedPage";
 import { ImageProvider } from "@/context/ImageContext";
+import { PostProvider } from "@/context/PostContext";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, loading } = useUser();
   if (loading) {
@@ -32,14 +29,8 @@ export default function AdminLayout({
         `}
         onClick={() => setSidebarOpen(false)}
       >
-        <div
-          className="absolute top-0 left-0 w-64 h-full z-30"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <AdminSidebar
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-          />
+        <div className="absolute top-0 left-0 w-64 h-full z-30" onClick={(e) => e.stopPropagation()}>
+          <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         </div>
       </div>
 
@@ -52,10 +43,7 @@ export default function AdminLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="flex items-center justify-between h-16 bg-white px-4 border-b flex-shrink-0">
-          <button
-            className="md:hidden text-gray-600"
-            onClick={() => setSidebarOpen(true)}
-          >
+          <button className="md:hidden text-gray-600" onClick={() => setSidebarOpen(true)}>
             <Menu className="w-6 h-6" />
           </button>
           <h1 className="text-xl font-bold text-gray-800">Trang Quản Trị</h1>
@@ -65,7 +53,9 @@ export default function AdminLayout({
         {/* Main Content Area */}
         <main className="flex-1 bg-gradient-to-br from-sky-50 to-white overflow-y-auto">
           <div className="container mx-auto max-w-screen-xl">
-            <ImageProvider>{children}</ImageProvider>
+            <PostProvider>
+              <ImageProvider>{children}</ImageProvider>
+            </PostProvider>
           </div>
         </main>
       </div>

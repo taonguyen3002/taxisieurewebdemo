@@ -5,9 +5,9 @@ interface FeatureData {
   desc: string;
 }
 const siteConfig = {
-  siteName: "Taxi Siêu Rẻ",
-  name: "Taxi Siêu Rẻ | Đặt 4 - 7 Chỗ Nhanh Nhất",
-  title: "Taxi Siêu Rẻ | Đặt 4 - 7 Chỗ Nhanh Nhất",
+  siteName: "Đặt Xe Siêu Rẻ",
+  name: "Đặt Xe Siêu Rẻ | Đặt 4 - 7 Chỗ Nhanh Nhất",
+  title: "Đặt Xe Siêu Rẻ | Đặt 4 - 7 Chỗ Nhanh Nhất",
   description:
     "Dịch vụ taxi liên tỉnh siêu rẻ , xe đời mới tài lâu năm đón nhanh chỉ 5 phút gọi xe đặt xe nhiều ưu đãi",
   domain: "https://blogs.taxisieure.com",
@@ -18,8 +18,8 @@ const siteConfig = {
   logo: "https://blogs.taxisieure.com/logo.png",
   contactInfo: {
     phone: "0559023567",
-    email: "nguyenhuutao1302@gmail.com",
-    address: "681 Bui Van Hoa, Bien Hoa ,Dong Nai",
+    email: "nguyenvantien.grap@gmail.com",
+    address: "210 Nguyễn Văn Cừ, Phường Nguyễn Cư Trinh, Quận 1, TP.HCM",
   },
 };
 const featureData: FeatureData[] = [
