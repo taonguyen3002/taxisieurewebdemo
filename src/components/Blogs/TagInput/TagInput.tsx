@@ -50,7 +50,10 @@ const TagInput: React.FC<TagInputProps> = ({ tags, setTags }) => {
 
     if (newTags.length === 0) return;
 
-    setTags((prev) => [...new Set([...prev, ...newTags])]);
+    setTags((prev) => {
+      const uniqueTags = Array.from(new Set([...prev, ...newTags]));
+      return uniqueTags;
+    });
     setInputValue("");
   };
 
