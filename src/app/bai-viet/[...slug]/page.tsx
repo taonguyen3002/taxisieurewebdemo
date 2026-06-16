@@ -77,9 +77,9 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   }
   const post = res.data;
   const getFullImageUrl = (url?: string) =>
-    url?.startsWith("http") ? url : `${process.env.NEXT_PUBLIC_API_URL}/${url ?? "default-blogs.png"}`;
+    url?.startsWith("http") ? url : `${process.env.DOMAIN}/${url ?? "default-blogs.png"}`;
   const imglink = getFullImageUrl(post.image?.url);
-  const canonicalUrl = `${url}/bai-viet/${slug}`;
+  const fullUrl = slug.startsWith(siteConfig.domain) ? slug : `${siteConfig.domain}/bai-viet/${slug}`;
   const headings = helperArrayHeading(post.content);
   const articleSection = headings.length > 0 ? headings : siteConfig.keywords.split(",");
   return {
@@ -87,7 +87,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
     description: post.description.substring(0, 160),
     keywords: post.tags,
     alternates: {
-      canonical: canonicalUrl,
+      canonical: fullUrl,
     },
     openGraph: {
       title: post.title,
@@ -128,11 +128,16 @@ const PostPage: FC<PostPageProps> = async ({ params }) => {
     );
   }
   const post: Post = res.data;
+  const author = {
+    name: post.authorName || "Admin",
+    url: post.authorUrl?.startsWith("https://") ? post.authorUrl : `${url}${post.authorUrl}`,
+  };
+  const fullUrl = slug.startsWith(siteConfig.domain) ? slug : `${siteConfig.domain}/bai-viet/${slug}`;
   // Giả sử post có trường _id dùng để xác định bài viết, nếu không hãy dùng slug
   const postId = post?._id || slug;
-  const getFullImageUrl = (url?: string) =>
-    url?.startsWith("http") ? url : `${process.env.NEXT_PUBLIC_API_URL}/${url ?? "default-blogs.png"}`;
-  const imglink = getFullImageUrl(post.image?.url);
+  const fullImageUrl = post.image?.url?.startsWith("http")
+    ? post.image?.url
+    : `${process.env.DOMAIN}/${post.image?.url ?? "default-blogs.png"}`;
   // Schema.org markup cho SEO
   const headings = helperArrayHeading(post.content);
   const articleSchema = {
@@ -140,25 +145,25 @@ const PostPage: FC<PostPageProps> = async ({ params }) => {
     "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
-    image: imglink,
+    image: fullImageUrl,
     author: {
       "@type": "Person",
-      name: post.authorName,
-      url: `${url}${post.authorUrl}`,
+      name: author.name,
+      url: author.url,
     },
     publisher: {
       "@type": "Organization",
-      name: "My Blog",
+      name: siteConfig.siteName,
       logo: {
         "@type": "ImageObject",
         url: siteConfig.logo,
       },
     },
-    datePublished: post.publishedDate ? post.publishedDate : "",
-    dateModified: post.modifiedDate ? post.modifiedDate || post.publishedDate : "",
+    datePublished: post.publishedDate || post.createdAt,
+    dateModified: post.modifiedDate ? post.modifiedDate : post.publishedDate,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${siteConfig.domain}/bai-viet/${slug}`,
+      "@id": fullUrl,
     },
     articleSection: headings.length > 0 ? headings : siteConfig.keywords.split(","),
     keywords: post?.tags ? post?.tags.join(", ") : siteConfig.keywords.split(","),
@@ -170,8 +175,8 @@ const PostPage: FC<PostPageProps> = async ({ params }) => {
         "@context": "https://schema.org",
         "@type": "Product",
         name: post.title,
-        image: post.image.url,
-        description: post.description ?? "",
+        image: fullImageUrl,
+        description: post.description ?? siteConfig.description,
         aggregateRating: {
           "@type": "AggregateRating",
           ratingValue: "5.0",
@@ -219,20 +224,20 @@ const PostPage: FC<PostPageProps> = async ({ params }) => {
         <main className="flex flex-col my-4">
           <h1 className="text-wrap text-left text-lg text-black">{post.title}</h1>
           <Box display="flex" alignItems="center" mb={2}>
-            <Avatar alt={post.authorName} src={post.authorUrl} />
-            <Link href={`${post.authorUrl}`} passHref>
+            <Avatar alt={author.name} src={fullImageUrl} />
+            <Link href={`${author.url}`} passHref>
               <Typography variant="body1" color="textSecondary" ml={2}>
-                By {post?.authorName} | Published on {new Date(post.publishedDate).toLocaleDateString()}
+                By {author.name} | Published on {new Date(post.publishedDate).toLocaleDateString()}
               </Typography>
             </Link>
           </Box>
           {/* Nội dung bài viết */}
           <div>
             <PostContent
-              authorUrl={post.authorUrl}
-              image={imglink}
+              authorUrl={author.url}
+              image={fullImageUrl}
               title={post.title}
-              author={post.authorName}
+              author={author.name}
               createdAt={post.publishedDate}
               content={post.content}
             />

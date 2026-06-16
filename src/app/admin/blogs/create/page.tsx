@@ -325,7 +325,6 @@ const NewPost: React.FC = () => {
             />
           </div>
           <div className="flex items-center gap-3 p-4 bg-white shadow rounded-lg w-full">
-            <TextField label="Tác giả" value={author.name} fullWidth aria-readonly />
             <TextField
               label="Số lượng likes"
               type="number"
@@ -333,8 +332,6 @@ const NewPost: React.FC = () => {
               onChange={(e) => setLikesCount(parseInt(e.target.value) || 0)}
               fullWidth
             />
-          </div>
-          <div className="flex items-center gap-3 p-4 bg-white shadow rounded-lg w-full">
             <TextField
               label="số điện thoại"
               value={numberphone}
@@ -342,6 +339,7 @@ const NewPost: React.FC = () => {
               onChange={(e) => setNumberphone(e.target.value)}
             />
           </div>
+
           <div className="flex items-center gap-3 p-4 bg-white shadow rounded-lg w-full">
             <TextField
               label="Tác Giả"

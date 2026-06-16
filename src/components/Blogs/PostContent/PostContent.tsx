@@ -61,17 +61,7 @@ const PostContent: FC<PostContentProps> = ({ title, author, authorUrl, createdAt
                 {siteConfig.contactInfo.email}
               </a>
             </li>
-            <li>
-              <span className="font-medium">Website:</span>{" "}
-              <a
-                href="https://taxisieure.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline hover:text-blue-800"
-              >
-                taxisieure.com
-              </a>
-            </li>
+
             <li>
               <span className="font-medium">Website:</span>{" "}
               <a
