@@ -24,7 +24,7 @@ function escapeXml(unsafe: string): string {
 
 // Sinh static URLs
 function buildStaticUrls() {
-  const pages = ["/", "/about", "/contact"];
+  const pages = ["/"];
   return pages
     .map(
       (path) =>
