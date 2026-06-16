@@ -15,7 +15,7 @@ async function getUser(id: string) {
         headers: {
           "Cache-Control": "no-store",
           "Content-Type": "application/json",
-          Origin: process.env.NEXT_PUBLIC_BASE_URL ?? siteConfig.domain,
+          Origin: siteConfig.domain ?? process.env.DOMAIN,
         },
       },
     );
