@@ -342,6 +342,20 @@ const NewPost: React.FC = () => {
               onChange={(e) => setNumberphone(e.target.value)}
             />
           </div>
+          <div className="flex items-center gap-3 p-4 bg-white shadow rounded-lg w-full">
+            <TextField
+              label="Tác Giả"
+              value={author.name}
+              onChange={(e) => setAuthor({ ...author, name: e.target.value })}
+              fullWidth
+            />
+            <TextField
+              label="Đường Dẫn Tác Giả"
+              value={author.url}
+              onChange={(e) => setAuthor({ ...author, url: e.target.value })}
+              fullWidth
+            />
+          </div>
           {/* breadcrumbs */}
           {breadcrumbs.map((b, i) => (
             <Box key={i} sx={{ display: "flex", gap: 2, alignItems: "center" }}>
@@ -367,7 +381,7 @@ const NewPost: React.FC = () => {
         {/* actions */}
         <DialogActions>
           <Button onClick={() => setOpenSettings(false)} color="inherit">
-            Cancel
+            Hủy
           </Button>
           <Button
             onClick={() => {
@@ -376,7 +390,7 @@ const NewPost: React.FC = () => {
             variant="contained"
             color="primary"
           >
-            OK
+            Xác nhận
           </Button>
         </DialogActions>
       </Dialog>

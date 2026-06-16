@@ -8,17 +8,11 @@ import { logoutUser } from "@/api/user/apiLogout";
 import SearchBar from "@/components/SearchBar";
 import { siteConfig } from "@/config/default.config";
 
-import {
-  Bars3Icon,
-  XMarkIcon,
-  PhoneArrowUpRightIcon,
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon, PhoneArrowUpRightIcon } from "@heroicons/react/24/outline";
 type Prop = {
   phone?: string;
 };
-export default function TailwindHeader({
-  phone = siteConfig.contactInfo.phone,
-}: Prop) {
+export default function TailwindHeader({ phone = siteConfig.contactInfo.phone }: Prop) {
   const { user, setUser } = useUser();
   const role = user?.role;
   const router = useRouter();
@@ -37,16 +31,8 @@ export default function TailwindHeader({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex flex-1 md:items-center gap-4">
-            <button
-              className="md:hidden"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Toggle menu"
-            >
-              {menuOpen ? (
-                <XMarkIcon className="h-6 w-6 text-white" />
-              ) : (
-                <Bars3Icon className="h-6 w-6 text-white" />
-              )}
+            <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
+              {menuOpen ? <XMarkIcon className="h-6 w-6 text-white" /> : <Bars3Icon className="h-6 w-6 text-white" />}
             </button>
 
             <Link href="/" className="text-lg font-bold text-white">
@@ -74,29 +60,16 @@ export default function TailwindHeader({
             )}
             {user && (
               <div className="relative group">
-                <img
-                  src={"/default-avatar.png"}
-                  alt="avatar"
-                  className="w-8 h-8 rounded-full cursor-pointer"
-                />
+                <img src={"/default-avatar.png"} alt="avatar" className="w-8 h-8 rounded-full cursor-pointer" />
                 <div className="absolute right-0 pt-2 w-48 bg-white shadow rounded hidden group-hover:block z-50">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-blue-700  hover:bg-blue-800"
-                  >
+                  <Link href="/profile" className="block px-4 py-2 text-sm text-blue-700  hover:bg-blue-800">
                     Tài khoản
                   </Link>
-                  <Link
-                    href="/history/order"
-                    className="block px-4 py-2 text-sm text-blue-700 hover:bg-blue-800"
-                  >
+                  <Link href="/history/order" className="block px-4 py-2 text-sm text-blue-700 hover:bg-blue-800">
                     Lịch Sử Đặt Xe
                   </Link>
                   {role === "admin" && (
-                    <Link
-                      href="/admin"
-                      className="block px-4 py-2 text-sm text-blue-700 hover:bg-blue-800"
-                    >
+                    <Link href="/admin" className="block px-4 py-2 text-sm text-blue-700 hover:bg-blue-800">
                       Quản trị
                     </Link>
                   )}
@@ -118,11 +91,7 @@ export default function TailwindHeader({
             <SearchBar isMobile={true} onItemClick={() => setMenuOpen(false)} />
 
             {/* Các link menu */}
-            <Link
-              href="/"
-              onClick={() => setMenuOpen(false)}
-              className="block px-4 py-2 text-white hover:bg-blue-800"
-            >
+            <Link href="/" onClick={() => setMenuOpen(false)} className="block px-4 py-2 text-white hover:bg-blue-800">
               Trang chủ
             </Link>
             <Link
@@ -144,7 +113,7 @@ export default function TailwindHeader({
               onClick={() => setMenuOpen(false)}
               className="block px-4 py-2 text-white hover:bg-blue-800"
             >
-              Giới thiệu
+              Giới Thiệu
             </Link>
             <Link
               href="/faq"

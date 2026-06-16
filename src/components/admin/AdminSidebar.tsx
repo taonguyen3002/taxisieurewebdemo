@@ -17,6 +17,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { logoutUser } from "@/api/user/apiLogout";
 import Link from "next/link";
+import { siteConfig } from "@/config/default.config";
 
 const sidebarItems = [
   { text: "Dashboard", icon: HomeIcon, route: "/admin" },
@@ -30,8 +31,8 @@ const sidebarItems = [
   },
   { text: "Người dùng", icon: UsersIcon, route: "/admin/user" },
   { text: "Đơn hàng", icon: BriefcaseIcon, route: "/admin/order" },
-  { text: "Settings", icon: Cog6ToothIcon, route: "/admin/settings" },
-  { text: "Profile", icon: UserIcon, route: "/admin/profile" },
+  { text: "Cài đặt", icon: Cog6ToothIcon, route: "/admin/settings" },
+  { text: "Hồ sơ", icon: UserIcon, route: "/admin/profile" },
   {
     text: "Tìm & Thay thế",
     icon: DocumentMagnifyingGlassIcon,
@@ -39,13 +40,7 @@ const sidebarItems = [
   },
 ];
 
-function AdminSidebar({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+function AdminSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const router = useRouter();
   const pathname = usePathname();
   const { setUser } = useUser();
@@ -58,18 +53,13 @@ function AdminSidebar({
   return (
     <>
       {/* Overlay for mobile & tablet */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-40 z-20 md:hidden"
-          onClick={onClose}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 bg-black bg-opacity-40 z-20 md:hidden" onClick={onClose} />}
 
       {/* Sidebar */}
       <aside className="h-full bg-white border-r flex flex-col relative z-30">
         <div className="flex items-center justify-center h-16 border-b flex-shrink-0">
           <Link href={"/"} className="text-xl font-bold">
-            GRAB
+            {siteConfig.siteName}
           </Link>
         </div>
 
@@ -86,11 +76,7 @@ function AdminSidebar({
                     onClose();
                   }}
                   className={`flex items-center w-full gap-3 rounded-lg px-4 py-2 text-sm font-medium transition
-                  ${
-                    isActive
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  ${isActive ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-100"}`}
                 >
                   <Icon className="h-5 w-5" />
                   {text}

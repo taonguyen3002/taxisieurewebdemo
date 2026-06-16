@@ -22,7 +22,7 @@ export default function Footer({ currentSlug }: { currentSlug?: string }) {
             </h2>
             <ul className="space-y-2">
               <li>Email : {siteConfig.contactInfo.email}</li>
-              <li>Domain: {siteConfig.domain}</li>
+              <li>Website: {siteConfig.domain}</li>
               <li>Phone: {siteConfig.contactInfo.phone}</li>
               <li>Address: {siteConfig.contactInfo.address}</li>
             </ul>
@@ -88,7 +88,7 @@ export default function Footer({ currentSlug }: { currentSlug?: string }) {
 
         {/* Chân */}
         <div className="text-center mt-8 text-sm border-t border-white/20 pt-4">
-          © 2025 {siteConfig.name}. All rights reserved.
+          © 2026 {siteConfig.name}. All rights reserved.
         </div>
       </div>
     </footer>
