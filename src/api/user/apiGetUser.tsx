@@ -1,6 +1,7 @@
 import axiosInstance from "../../untils/axios";
 import axios, { AxiosError } from "axios";
 import type { UserProfile } from "@/types/User";
+import { siteConfig } from "@/config/default.config";
 interface ApiResponse {
   success: boolean;
   result: UserProfile | null;
@@ -9,15 +10,14 @@ interface ApiResponse {
 async function getUser(id: string) {
   try {
     const { data } = await axios.get<ApiResponse>(
-      `https://datxecongnghe.io.vn/api/user?id=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL ?? "https://api.taxinhanh247.pro.vn"}/api/user?id=${id}`,
       {
         headers: {
           "Cache-Control": "no-store",
           "Content-Type": "application/json",
-          Origin:
-            process.env.NEXT_PUBLIC_BASE_URL ?? "https://datxenhanh-24h.pro.vn",
+          Origin: process.env.NEXT_PUBLIC_BASE_URL ?? siteConfig.domain,
         },
-      }
+      },
     );
     if (!data.success) {
       return {
@@ -57,15 +57,9 @@ async function getAllUsers() {
     let errorMessage = "An unknown error occurred";
     if (typeof error === "object" && error !== null) {
       const axiosError = error as AxiosError<{ message?: string }>;
-      if (
-        axiosError.response?.data?.message &&
-        typeof axiosError.response.data.message === "string"
-      ) {
+      if (axiosError.response?.data?.message && typeof axiosError.response.data.message === "string") {
         errorMessage = axiosError.response.data.message;
-      } else if (
-        "message" in error &&
-        typeof (error as Error).message === "string"
-      ) {
+      } else if ("message" in error && typeof (error as Error).message === "string") {
         errorMessage = (error as Error).message;
       }
     }

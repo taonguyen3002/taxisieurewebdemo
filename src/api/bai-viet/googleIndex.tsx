@@ -4,15 +4,11 @@ type UpdateIndexResult = {
   result?: any; // Adjust type as needed based on your API response
   error?: string;
 };
-export async function updateGoogleIndex(
-  slug: string
-): Promise<UpdateIndexResult> {
+export async function updateGoogleIndex(slug: string): Promise<UpdateIndexResult> {
   try {
     const response = await axios.post(
-      `${
-        process.env.NEXT_PUBLIC_API_URL ?? "https://datxecongnghe.io.vn"
-      }/api/index-url`,
-      { slug }
+      `${process.env.NEXT_PUBLIC_API_URL ?? "https://api.taxinhanh247.pro.vn"}/api/index-url`,
+      { slug },
     );
     return { success: true, result: response.data };
   } catch (error) {

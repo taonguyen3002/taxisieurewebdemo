@@ -16,7 +16,7 @@ type ApiResponse = {
 
 export async function readSettingApi(): Promise<ApiResponse> {
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL ?? "https://datxecongnghe.io.vn"}/api/setting/read/all`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL ?? "https://api.taxinhanh247.pro.vn"}/api/setting/read/all`;
 
     const response = await fetch(url, {
       next: { revalidate: 86400, tags: ["settings"] }, // 24h

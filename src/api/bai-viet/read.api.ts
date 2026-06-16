@@ -12,9 +12,7 @@ type GetPostslicePage = {
 };
 export async function getPost(slug: string) {
   try {
-    const url = `${
-      process.env.NEXT_PUBLIC_API_URL ?? "https://datxecongnghe.io.vn"
-    }/api/posts/${slug}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL ?? "https://api.taxinhanh247.pro.vn"}/api/posts/${slug}`;
 
     const response = await fetch(url, {
       next: { revalidate: 2592000 }, // 👈 ISR: cache 24h
@@ -134,10 +132,7 @@ async function getFilterTagsPosts(tags: string[], limit?: number) {
   }
 }
 
-const getPostslicePage = async (
-  currentPage?: number,
-  limit?: number
-): Promise<GetPostslicePage> => {
+const getPostslicePage = async (currentPage?: number, limit?: number): Promise<GetPostslicePage> => {
   try {
     if (!currentPage || !limit) {
       throw new Error("Page and limit parameters are required");
@@ -178,9 +173,7 @@ const getPostslicePage = async (
 };
 async function searchPosts(input: string) {
   try {
-    const response = await axiosInstance(
-      `/api/posts/find/query?q=${encodeURIComponent(input)}&limit=10`
-    );
+    const response = await axiosInstance(`/api/posts/find/query?q=${encodeURIComponent(input)}&limit=10`);
     return {
       success: true,
       data: response?.data?.data || [],
@@ -188,17 +181,9 @@ async function searchPosts(input: string) {
   } catch (error: unknown) {
     return {
       success: false,
-      error:
-        ((error as AxiosError).response?.data as { message: string })
-          ?.message || (error as AxiosError).message,
+      error: ((error as AxiosError).response?.data as { message: string })?.message || (error as AxiosError).message,
     };
   }
 }
 
-export {
-  getPostslicePage,
-  getAllPosts,
-  getFilterTagsPosts,
-  getPostById,
-  searchPosts,
-};
+export { getPostslicePage, getAllPosts, getFilterTagsPosts, getPostById, searchPosts };

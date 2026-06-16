@@ -1,17 +1,11 @@
 import { Metadata } from "next";
 import { Post } from "../types/Post";
 
-const BaseApi =
-  process.env.NEXT_PUBLIC_API_URL ?? "https://datxecongnghe.io.vn";
+const BaseApi = process.env.NEXT_PUBLIC_API_URL ?? "https://api.taxinhanh247.pro.vn";
 const UrlWeb = process.env.DOMAIN || "";
 
-export async function generateMetadata(
-  post: Post,
-  slug: string
-): Promise<Metadata> {
-  const fullImageUrl = post?.image?.url
-    ? `${BaseApi}${post.image.url}`
-    : `${UrlWeb}/default-image.jpg`;
+export async function generateMetadata(post: Post, slug: string): Promise<Metadata> {
+  const fullImageUrl = post?.image?.url ? `${BaseApi}${post.image.url}` : `${UrlWeb}/default-image.jpg`;
 
   return {
     title: post.title,
