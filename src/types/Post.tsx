@@ -3,6 +3,9 @@
 export type Image = {
   url: string;
   alt?: string;
+  caption?: string;
+  height?: number;
+  width?: number;
 };
 
 export type Breadcrumb = {

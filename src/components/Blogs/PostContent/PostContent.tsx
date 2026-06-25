@@ -9,21 +9,11 @@ type PostContentProps = {
   author: string;
   createdAt: string;
   content: string;
-  image: string;
 };
 
-const PostContent: FC<PostContentProps> = ({ title, author, authorUrl, createdAt, content, image }) => {
+const PostContent: FC<PostContentProps> = ({ title, author, authorUrl, createdAt, content }) => {
   return (
     <article className="max-w-4xl bg-white mx-auto p-4">
-      {/* Ảnh */}
-      {image && (
-        <section className="w-full flex justify-center mb-6">
-          <div className="relative w-full md:w-[70%] aspect-[3/2] rounded overflow-hidden">
-            <img src={image} alt={title} className="absolute w-full h-full object-cover rounded" loading="lazy" />
-          </div>
-        </section>
-      )}
-
       {/* Nội dung bài viết */}
       <div className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-full w-full mx-auto overflow-hidden blog-content">
         <div dangerouslySetInnerHTML={{ __html: content }} />

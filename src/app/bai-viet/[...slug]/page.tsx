@@ -1,10 +1,11 @@
 // app/blogs/[slug]/page.tsx
-export const revalidate = 2592000;
+export const revalidate = 3600; // 1 hour for better freshness
 import { FC } from "react";
 import React from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Metadata } from "next";
+import Image from "next/image";
+import { Metadata, ResolvingMetadata } from "next";
 import { getPost } from "@/api/bai-viet/read.api";
 import { Box, Typography, Avatar, Divider, Chip, Container } from "@mui/material";
 import type { Post } from "@/types/Post";
@@ -34,14 +35,22 @@ const url = siteConfig.domain || process.env.DOMAIN;
 type PostPageProps = {
   params: { slug: string[] }; // slug là mảng các segment
 };
+
+// Utility functions for SEO
+const getFullImageUrl = (url?: string): string =>
+  url?.startsWith("http") ? url : `${process.env.DOMAIN}/${url ?? "default-blogs.png"}`;
+
+const getCleanDescription = (desc: string, length: number = 160): string =>
+  desc?.replace(/<[^>]*>/g, "").substring(0, length) || "";
+
 // Generate SEO metadata
-export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PostPageProps, parent: ResolvingMetadata): Promise<Metadata> {
   const slug = Array.isArray(params.slug) ? params.slug.join("/") : params.slug;
+
   if (!slug) {
     return {
-      title: "404 - Page Not Found | GrapViet",
-      description:
-        "Sorry, the page you are looking for cannot be found. Please check the URL or return to our homepage.",
+      title: "404 - Trang không tìm thấy | GrapViet",
+      description: "Xin lỗi, trang bạn đang tìm kiếm không tồn tại. Vui lòng kiểm tra URL hoặc quay lại trang chủ.",
       robots: {
         index: false,
         follow: true,
@@ -51,71 +60,97 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
           follow: true,
         },
       },
-      alternates: {
-        canonical: `${url}/404`,
-      },
       openGraph: {
-        title: "404 - Page Not Found | GrapViet",
-        description:
-          "Sorry, the page you are looking for cannot be found. Please check the URL or return to our homepage.",
+        title: "404 - Trang không tìm thấy | GrapViet",
+        description: "Xin lỗi, trang bạn đang tìm kiếm không tồn tại.",
         type: "website",
-        siteName: "Xe Grap Đồng Nai",
+        siteName: siteConfig.siteName,
       },
     };
   }
+
   const res = await getPost(slug);
   if (!res?.success || !res?.data) {
-    console.error(`Failed to fetch post with slug: ${slug}`);
     return {
-      title: "bài viết không tồn tại",
-      description: "The requested page could not be found.",
+      title: "Bài viết không tồn tại | GrapViet",
+      description: "Bài viết bạn tìm kiếm không tồn tại hoặc đã bị xóa.",
       robots: {
         index: false,
         follow: false,
       },
     };
   }
+
   const post = res.data;
-  const getFullImageUrl = (url?: string) =>
-    url?.startsWith("http") ? url : `${process.env.DOMAIN}/${url ?? "default-blogs.png"}`;
   const imglink = getFullImageUrl(post.image?.url);
   const fullUrl = slug.startsWith(siteConfig.domain) ? slug : `${siteConfig.domain}/bai-viet/${slug}`;
-  const headings = helperArrayHeading(post.content);
-  const articleSection = headings.length > 0 ? headings : siteConfig.keywords.split(",");
+  const cleanDescription = getCleanDescription(post.description, 160);
+  const keywords = Array.isArray(post.tags) ? post.tags : [];
+
+  // Twitter Card & Facebook meta tags
+  const twitterHandle = process.env.TWITTER_HANDLE || "@GrapViet";
+
   return {
-    title: post.title,
-    description: post.description.substring(0, 160),
-    keywords: post.tags,
+    title: `${post.title} | GrapViet`,
+    description: cleanDescription,
+    keywords: [...keywords, siteConfig.keywords].filter(Boolean).join(", "),
+    authors: [{ name: post.authorName || "Admin" }],
+    creator: post.authorName || "GrapViet",
+    publisher: siteConfig.siteName,
+    metadataBase: new URL(process.env.DOMAIN || "https://grapviet.com"),
     alternates: {
       canonical: fullUrl,
+      languages: {
+        "vi-VN": fullUrl,
+      },
     },
     openGraph: {
       title: post.title,
-      description: post.description.substring(0, 160),
-      images: [imglink],
+      description: cleanDescription,
+      url: fullUrl,
       type: "article",
+      publishedTime: post.publishedDate,
+      modifiedTime: post.modifiedDate || post.publishedDate,
+      authors: [post.authorName || "Admin"],
+      tags: keywords,
+      images: [
+        {
+          url: imglink,
+          width: post.image?.width || 1200,
+          height: post.image?.height || 630,
+          alt: post.title,
+          type: "image/jpeg",
+        },
+      ],
+      siteName: siteConfig.siteName,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: cleanDescription,
+      images: [imglink],
+      creator: twitterHandle,
     },
     other: {
       "article:published_time": post.publishedDate,
       "article:modified_time": post.modifiedDate || post.publishedDate,
-      "article:author": post.authorName,
-      "article:section": articleSection,
-      "article:tag": post.tags.join(", "),
+      "article:author": post.authorName || "Admin",
+      "article:section": post.category || "Blog",
+      "article:tag": keywords.join(", "),
+      "og:locale": "vi_VN",
     },
   };
 }
 
 const PostPage: FC<PostPageProps> = async ({ params }) => {
-  // Kết hợp lại thành chuỗi slug
   const slug = Array.isArray(params.slug) ? params.slug.join("/") : params.slug;
+
   if (!slug) {
     return <Typography color="error">URL không tồn tại</Typography>;
   }
 
   const res = await getPost(slug);
   if (!res?.success || !res?.data) {
-    console.error("Failed to fetch post:", res?.error);
-    //404 page
     return (
       <>
         <SettingWrapper slug={slug} Component={Header} />
@@ -127,25 +162,39 @@ const PostPage: FC<PostPageProps> = async ({ params }) => {
       </>
     );
   }
+
   const post: Post = res.data;
   const author = {
     name: post.authorName || "Admin",
     url: post.authorUrl?.startsWith("https://") ? post.authorUrl : `${url}${post.authorUrl}`,
   };
   const fullUrl = slug.startsWith(siteConfig.domain) ? slug : `${siteConfig.domain}/bai-viet/${slug}`;
-  // Giả sử post có trường _id dùng để xác định bài viết, nếu không hãy dùng slug
   const postId = post?._id || slug;
-  const fullImageUrl = post.image?.url?.startsWith("http")
-    ? post.image?.url
-    : `${process.env.DOMAIN}/${post.image?.url ?? "default-blogs.png"}`;
-  // Schema.org markup cho SEO
+  const fullImageUrl = getFullImageUrl(post.image?.url);
+  const cleanDescription = getCleanDescription(post.description);
   const headings = helperArrayHeading(post.content);
+  const keywords = Array.isArray(post.tags) ? post.tags : [];
+  const estimatedReadingTime = Math.ceil((post.content?.split(" ").length ?? 0) / 200); // 200 words per minute
+
+  // ===== COMPREHENSIVE SCHEMA.ORG MARKUP =====
+
+  // 1. Article Schema - Enhanced
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
+    "@id": fullUrl,
     headline: post.title,
-    description: post.description,
-    image: fullImageUrl,
+    alternativeHeadline: post.title,
+    description: cleanDescription,
+    abstract: cleanDescription,
+    image: {
+      "@type": "ImageObject",
+      url: fullImageUrl,
+      width: post.image?.width || 1200,
+      height: post.image?.height || 630,
+      caption: post.title,
+    },
+    articleBody: post.content,
     author: {
       "@type": "Person",
       name: author.name,
@@ -157,112 +206,235 @@ const PostPage: FC<PostPageProps> = async ({ params }) => {
       logo: {
         "@type": "ImageObject",
         url: siteConfig.logo,
+        width: 512,
+        height: 512,
       },
+      url: siteConfig.domain,
+    },
+    editor: {
+      "@type": "Person",
+      name: author.name,
     },
     datePublished: post.publishedDate || post.createdAt,
-    dateModified: post.modifiedDate ? post.modifiedDate : post.publishedDate,
+    dateModified: post.modifiedDate || post.publishedDate,
+    dateCreated: post.createdAt,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": fullUrl,
     },
-    articleSection: headings.length > 0 ? headings : siteConfig.keywords.split(","),
-    keywords: post?.tags ? post?.tags.join(", ") : siteConfig.keywords.split(","),
+    articleSection: post.category || "Blog",
+    keywords: keywords.join(", "),
+    inLanguage: "vi-VN",
+    copyrightYear: new Date(post.publishedDate).getFullYear(),
+    copyrightHolder: {
+      "@type": "Organization",
+      name: siteConfig.siteName,
+    },
+    commentCount: 0,
+    timeRequired: `PT${estimatedReadingTime}M`,
   };
-  const hasLikes = (post.likes?.length ?? 0) > 0;
 
+  // 2. Author Schema - Separate
+  const authorSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: author.name,
+    url: author.url,
+    image: fullImageUrl,
+    description: `Tác giả của ${siteConfig.siteName}`,
+  };
+
+  // 3. Breadcrumb Schema - Enhanced
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Trang chủ",
+        item: siteConfig.domain,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${siteConfig.domain}/bai-viet`,
+      },
+      ...(post.breadcrumbs || []).map((breadcrumb: any, index: number) => ({
+        "@type": "ListItem",
+        position: index + 3,
+        name: breadcrumb.name,
+        item: `${siteConfig.domain}${breadcrumb.url}`,
+      })),
+      {
+        "@type": "ListItem",
+        position: (post.breadcrumbs?.length || 0) + 3,
+        name: post.title,
+        item: fullUrl,
+      },
+    ],
+  };
+
+  // 4. Organization Schema
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteConfig.siteName,
+    url: siteConfig.domain,
+    logo: siteConfig.logo,
+    description: siteConfig.description,
+    sameAs: [process.env.FACEBOOK_URL || "", process.env.TWITTER_URL || "", process.env.LINKEDIN_URL || ""].filter(
+      Boolean,
+    ),
+  };
+
+  // 5. Review/Rating Schema - Only if has likes
+  const hasLikes = (post.likes?.length ?? 0) > 0;
   const reviewSchema = hasLikes
     ? {
         "@context": "https://schema.org",
-        "@type": "Product",
+        "@type": "AggregateRating",
+        ratingValue: "5.0",
+        bestRating: "5.0",
+        worstRating: "1",
+        ratingCount: post.likes?.length ?? 1,
+        reviewCount: post.likes?.length ?? 1,
         name: post.title,
-        image: fullImageUrl,
-        description: post.description ?? siteConfig.description,
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: "5.0",
-          bestRating: "5.0",
-          ratingCount: post.likes?.length ?? 1,
-        },
       }
     : null;
+
   return (
     <>
-      <section>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              itemListElement: post.breadcrumbs.map((breadcrumb, index) => ({
-                "@type": "ListItem",
-                position: index + 1,
-                name: breadcrumb.name,
-                item: `${siteConfig.domain}${breadcrumb.url}`,
-              })),
-            }),
-          }}
-        />
-        {reviewSchema && (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(reviewSchema),
-            }}
-          />
-        )}
-      </section>
+      {/* ===== STRUCTURED DATA (JSON-LD) ===== */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(authorSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      {reviewSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }} />
+      )}
+
+      {/* ===== PAGE CONTENT ===== */}
       <SettingWrapper slug={slug} Component={Header} />
-      <Container>
-        {/* Breadcrumbs */}
-        <Box my={2}>
-          <BreadcrumbsComponent breadcrumbs={post.breadcrumbs} currentTitle={post.title} />
-        </Box>
+      <article itemScope itemType="https://schema.org/BlogPosting">
+        {/* Hidden meta for schema.org */}
+        <meta itemProp="headline" content={post.title} />
+        <meta itemProp="description" content={cleanDescription} />
+        <meta itemProp="image" content={fullImageUrl} />
+        <meta itemProp="author" content={author.name} />
+        <meta itemProp="datePublished" content={post.publishedDate} />
+        <meta itemProp="dateModified" content={post.modifiedDate || post.publishedDate} />
 
-        {/* Main Post Content */}
-        <main className="flex flex-col my-4">
-          <h1 className="text-wrap text-left text-lg text-black">{post.title}</h1>
-          <Box display="flex" alignItems="center" mb={2}>
-            <Avatar alt={author.name} src={fullImageUrl} />
-            <Link href={`${author.url}`} passHref>
-              <Typography variant="body1" color="textSecondary" ml={2}>
-                By {author.name} | Published on {new Date(post.publishedDate).toLocaleDateString()}
-              </Typography>
-            </Link>
+        <Container maxWidth="md">
+          {/* Breadcrumbs */}
+          <Box component="nav" my={2} aria-label="breadcrumb">
+            <BreadcrumbsComponent breadcrumbs={post.breadcrumbs} currentTitle={post.title} />
           </Box>
-          {/* Nội dung bài viết */}
-          <div>
-            <PostContent
-              authorUrl={author.url}
-              image={fullImageUrl}
-              title={post.title}
-              author={author.name}
-              createdAt={post.publishedDate}
-              content={post.content}
-            />
-            <LikePost postId={postId} postLikes={post.likes ?? []} />
+
+          {/* Main Post Content */}
+          <main className="flex flex-col my-4">
+            <header>
+              <h1 className="text-wrap text-left text-4xl font-bold text-black mb-4">{post.title}</h1>
+            </header>
+
+            {/* Author & Date Info */}
+            <Box component="div" display="flex" alignItems="center" mb={3} sx={{ gap: 2 }}>
+              <Avatar alt={author.name} src={fullImageUrl} sx={{ width: 48, height: 48 }} />
+              <Box>
+                <Link href={author.url} title={`Hồ sơ tác giả: ${author.name}`}>
+                  <Typography variant="body1" component="span" sx={{ fontWeight: 600 }}>
+                    {author.name}
+                  </Typography>
+                </Link>
+                <Box component="div" display="flex" gap={1} flexWrap="wrap" sx={{ fontSize: "0.9rem" }}>
+                  <time dateTime={post.publishedDate}>{new Date(post.publishedDate).toLocaleDateString("vi-VN")}</time>
+                  <span aria-label="thời gian đọc ước tính">• {estimatedReadingTime} phút đọc</span>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Featured Image */}
+            {post.image?.url && (
+              <Box component="figure" my={3} sx={{ margin: "20px 0" }}>
+                <Image
+                  src={fullImageUrl}
+                  alt={post.title}
+                  width={post.image?.width || 800}
+                  height={post.image?.height || 450}
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 100vw"
+                  style={{ width: "100%", height: "auto" }}
+                />
+                {post.image?.caption && (
+                  <figcaption className="text-center text-gray-600 text-sm mt-2">{post.image.caption}</figcaption>
+                )}
+              </Box>
+            )}
+
+            {/* Divider */}
             <Divider sx={{ my: 2 }} />
-            {post.tags.map((tag, index) => (
-              <Chip key={index} label={`#${tag}`} sx={{ mr: 1, mb: 1 }} />
-            ))}
-          </div>
-        </main>
 
-        {/* Comments Section: chỉ hiển thị nếu bài viết tồn tại */}
-        <Box mb={5}>
-          <CommentsSection postId={postId} />
-        </Box>
+            {/* Post Content */}
+            <div itemProp="articleBody">
+              <PostContent
+                authorUrl={author.url}
+                title={post.title}
+                author={author.name}
+                createdAt={post.publishedDate}
+                content={post.content}
+              />
+            </div>
 
-        {/* FAQ Schema */}
-        <FAQSchema content={post.content} />
-        <GetReviewBlogsWithTags excludeSlug={post.slug} tags={post.tags} />
-        <TrackUserLocation />
+            {/* Like/Engagement */}
+            <LikePost postId={postId} postLikes={post.likes ?? []} />
 
-        <SettingWrapper slug={slug} Component={CallPrompt} />
-        <SettingWrapper slug={slug} Component={ActionButton} />
-        <SettingWrapper slug={slug} Component={LabelBottomNavigation} />
-      </Container>
+            {/* Divider */}
+            <Divider sx={{ my: 3 }} />
+
+            {/* Tags */}
+            <Box component="footer" sx={{ mb: 3 }}>
+              <Typography variant="body2" component="span" sx={{ fontWeight: 600, display: "block", mb: 1 }}>
+                Thẻ:
+              </Typography>
+              <Box component="div" display="flex" flexWrap="wrap" gap={1}>
+                {keywords.map((tag, index) => (
+                  <Chip
+                    key={index}
+                    label={`#${tag}`}
+                    component="span"
+                    sx={{ mr: 1, mb: 1, cursor: "pointer", "&:hover": { backgroundColor: "#f0f0f0" } }}
+                  />
+                ))}
+              </Box>
+            </Box>
+          </main>
+
+          {/* Comments Section */}
+          <Box component="section" mb={5} aria-labelledby="comments-heading">
+            <CommentsSection postId={postId} />
+          </Box>
+
+          {/* FAQ Schema */}
+          <Box component="section" mb={5}>
+            <FAQSchema content={post.content} />
+          </Box>
+
+          {/* Related Posts */}
+          <Box component="section" mb={5} aria-labelledby="related-posts-heading">
+            <GetReviewBlogsWithTags excludeSlug={post.slug} tags={post.tags} />
+          </Box>
+
+          {/* Track Location */}
+          <TrackUserLocation />
+
+          {/* Call to Action & Floating Navigation */}
+          <SettingWrapper slug={slug} Component={CallPrompt} />
+          <SettingWrapper slug={slug} Component={ActionButton} />
+          <SettingWrapper slug={slug} Component={LabelBottomNavigation} />
+        </Container>
+      </article>
+
       <Footer currentSlug={slug} />
     </>
   );

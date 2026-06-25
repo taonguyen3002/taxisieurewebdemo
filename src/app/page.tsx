@@ -1,10 +1,11 @@
-// app/blogs/[slug]/Home.tsx
+// app/page.tsx
 
 import { Box, Container, Grid, Typography } from "@mui/material";
 import GetReviewBlogsWithTags from "@/components/Blogs/GetBlogs/GetReviewWithTag";
 import TrackUserLocation from "@/components/TrackLocation";
 import Footer from "@/components/Footer";
 import { Metadata } from "next";
+import Link from "next/link";
 import Image from "next/image";
 import SlideHero from "@/components/Home/Slide/SlideHero";
 import TaxiServiceIntro from "@/components/Home/Intro/IntroService";
@@ -15,8 +16,7 @@ import StaticSection from "@/components/Home/StaticSection/StaticSection";
 import TopDrivers from "@/components/Home/TopDrivers/TopDrivers";
 import { featureData, siteConfig } from "@/config/default.config";
 
-import { Feature } from "@/types/Home"; // Import types
-import Link from "next/link";
+import { Feature } from "@/types/Home";
 //components
 import ActionButton from "@/components/ActionButton";
 import LabelBottomNavigation from "@/components/BottomNavigation";
@@ -105,19 +105,9 @@ export default function Home() {
                     width: "100%",
                   }}
                 >
-                  <Image
-                    src={feature.src}
-                    alt={feature.alt}
-                    width={60}
-                    height={60}
-                    style={{ objectFit: "cover" }}
-                  />
+                  <Image src={feature.src} alt={feature.alt} width={60} height={60} style={{ objectFit: "cover" }} />
                   <Box sx={{ textAlign: "center" }}>
-                    <Typography
-                      variant="h6"
-                      sx={{ marginTop: "10px" }}
-                      gutterBottom
-                    >
+                    <Typography variant="h6" sx={{ marginTop: "10px" }} gutterBottom>
                       {feature.title}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
@@ -166,14 +156,11 @@ export default function Home() {
                 }}
                 gutterBottom
               >
-                Bài Viết Gần Nhất
+                Bài Viết Gần Đây
               </Typography>
             </Link>
           </Box>
-          <GetReviewBlogsWithTags
-            tags={siteConfig.keywords.split(",")}
-            limit={16}
-          />
+          <GetReviewBlogsWithTags tags={siteConfig.keywords.split(",")} limit={16} />
         </Container>
         <LabelBottomNavigation />
         <ActionButton />
